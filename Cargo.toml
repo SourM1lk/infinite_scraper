@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 structopt = "*"
-reqwest = { version = "*", features = ["blocking", "json"] }
+reqwest = { version = "*", features = ["json"] }
 tokio = { version = "*", features = ["full"] }
 url = "*"
 scraper = "*"
