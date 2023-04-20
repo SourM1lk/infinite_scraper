@@ -1,38 +1,17 @@
-use reqwest::Client;
-use scraper::{Html, Selector};
-use std::env;
-use std::error::Error;
+mod config;
+mod crawler;
 
-async fn fetch_links(url: &str) -> Result<Vec<String>, Box<dyn Error>> {
-    let client = Client::new();
-    let response = client.get(url).send().await?;
-    let body = response.text().await?;
-    let links = extract_links(&body);
-    Ok(links)
-}
-
-fn extract_links(body: &str) -> Vec<String> {
-    let document = Html::parse_document(body);
-    let selector = Selector::parse("a").unwrap();
-
-    document
-        .select(&selector)
-        .filter_map(|element| element.value().attr("href"))
-        .map(|link| link.to_string())
-        .collect()
-}
+use config::{CliOptions, ScraperConfig};
+use crawler::Crawler;
+use structopt::StructOpt;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let base_url = env::var("BASE_URL").expect("BASE_URL is not set");
-    let start_path = env::var("START_PATH").expect("START_PATH is not set");
-    let url = format!("{}{}", base_url, start_path);
+    let options = CliOptions::from_args();
+    let config = ScraperConfig::from_options(options)?;
 
-    let links = fetch_links(&url).await?;
-
-    for link in links {
-        println!("{}", link);
-    }
+    let crawler = Crawler { config };
+    crawler.run().await?;
 
     Ok(())
 }
