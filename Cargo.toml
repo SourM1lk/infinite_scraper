@@ -4,8 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-structopt = "*"
-reqwest = { version = "*", features = ["json"] }
-tokio = { version = "*", features = ["full"] }
-url = "*"
+reqwest = "*"
 scraper = "*"
+tokio = { version = "*", features = ["full"] }
+structopt = "*"
