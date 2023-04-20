@@ -1,0 +1,14 @@
+[package]
+name = "web_scraper"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+structopt = "*"
+reqwest = { version = "*", features = ["json"] }
+tokio = { version = "*", features = ["full"] }
+serde = "*"
+serde_json = "*"
+url = "*"
+select = "*"
+futures = "*"
