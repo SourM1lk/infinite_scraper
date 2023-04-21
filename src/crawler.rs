@@ -1,5 +1,6 @@
 use reqwest::Url;
 use scraper::{Html, Selector};
+use crate::config::ScraperConfig;
 use std::collections::HashSet;
 
 pub struct Crawler {
@@ -7,6 +8,10 @@ pub struct Crawler {
 }
 
 impl Crawler {
+    pub fn new(config: ScraperConfig) -> Self {
+        Crawler { config }
+    }
+
     pub async fn run(&self) -> Result<(), Box<dyn std::error::Error>> {
         let mut visited_urls: HashSet<String> = HashSet::new();
         let mut urls_to_visit = vec![self.config.start_path.clone()];

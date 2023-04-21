@@ -8,3 +8,7 @@ reqwest = "*"
 scraper = "*"
 tokio = { version = "*", features = ["full"] }
 structopt = "*"
+cssparser = "*"
+kuchiki = "*"
+selectors = "*"
+itertools = "0.10.5"

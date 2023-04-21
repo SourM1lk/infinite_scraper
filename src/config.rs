@@ -1,6 +1,6 @@
 use structopt::StructOpt;
 
-#[derive(StructOpt, Debug)]
+#[derive(StructOpt, Debug, Clone)]
 #[structopt(
     name = "Web Scraper",
     about = "A Rust-based web scraper for a specific domain/address.",
@@ -11,8 +11,24 @@ pub struct CliOptions {
 
     #[structopt(long = "start_path", short = "s", default_value = "/")]
     pub start_path: String,
+
+    #[structopt(long = "crawl")]
+    pub crawl: bool,
+
+    #[structopt(long = "scrape")]
+    pub scrape: bool,
+
+    #[structopt(long = "selectors")]
+    pub selectors: bool,
+
+    #[structopt(long = "css_selectors", default_value = "")]
+    pub css_selectors: String,
+
+    #[structopt(long)]
+    pub include_duplicates: bool,
 }
 
+#[derive(Clone)]
 pub struct ScraperConfig {
     pub base_url: String,
     pub start_path: String,
