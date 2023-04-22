@@ -1,10 +1,10 @@
 use crate::config::ScraperConfig;
+use regex::Regex;
 use scraper::{Html, Selector};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use serde_json;
-use std::fs::{OpenOptions};
+use std::fs::OpenOptions;
 use std::io::prelude::*;
-use std::fs::File;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ScrapedData {
@@ -30,44 +30,74 @@ impl Scraper {
     pub fn new(config: ScraperConfig) -> Self {
         Scraper { config }
     }
+    pub async fn scrape_data(&self, selectors: &[String],) -> Result<(), Box<dyn std::error::Error>> {
+        if self.config.use_regex {
+            println!("Scraping data with regex patterns.");
+            self.scrape_data_with_regex(selectors).await?;
+        } else {
+            let url = &self.config.base_url;
+            let response = reqwest::get(url).await?;
+            println!("Page fetched successfully.");
+            let html = response.text().await?;
+            let parsed_html = Html::parse_document(&html);
 
-    pub async fn run(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let url = format!("{}{}", self.config.base_url, self.config.start_path);
-        let response = reqwest::get(&url).await?;
-        let html = Html::parse_document(&response.text().await?);
+            for selector in selectors {
+                let scraper_selector = match Selector::parse(selector) {
+                    Ok(selector) => selector,
+                    Err(_err) => {
+                        eprintln!("Invalid selector");
+                        continue;
+                    }
+                };
 
-        println!("Scraped data from: {}", url);
+                println!("\nScraping data for selector: {}", selector);
+                for element in parsed_html.select(&scraper_selector) {
+                    let content = element.text().collect::<Vec<_>>().join(" ");
+                    let trimmed_content = content.trim().to_string();
+                    let scraped_data = ScrapedData {
+                        content: trimmed_content.clone(),
+                    };
+                    save_scraped_data_as_json(&scraped_data, "output.json")
+                        .expect("Failed to save data as JSON");
+
+                    println!("{}", element.inner_html().trim());
+                    println!("{}", content);
+                    println!("{{\"{}\"}}", content);
+                    println!("{}", content);
+                }
+            }
+        }
 
         Ok(())
     }
-    
-    pub async fn scrape_data(&self, selectors: &[String]) -> Result<(), Box<dyn std::error::Error>> {
+
+    pub async fn scrape_data_with_regex(
+        &self,
+        patterns: &[String],
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let url = &self.config.base_url;
-        println!("Fetching page: {}", url);
         let response = reqwest::get(url).await?;
         println!("Page fetched successfully.");
         let html = response.text().await?;
-        let parsed_html = Html::parse_document(&html);
 
-        for selector in selectors {
-            let scraper_selector = match Selector::parse(selector) {
-                Ok(selector) => selector,
-                Err(err) => {
-                    eprintln!("Invalid selector");
+        for pattern in patterns {
+            let regex = match Regex::new(pattern) {
+                Ok(regex) => regex,
+                Err(_err) => {
+                    eprintln!("Invalid regex pattern");
                     continue;
                 }
             };
 
-            println!("\nScraping data for selector: {}", selector);
-            for element in parsed_html.select(&scraper_selector) {
-                let content = element.text().collect::<Vec<_>>().join(" ");
-                let trimmed_content = content.trim().to_string();
+            println!("\nScraping data for regex pattern: {}", pattern);
+            for capture in regex.captures_iter(&html) {
+                let content = capture.get(0).map_or("", |m| m.as_str()).to_string();
                 let scraped_data = ScrapedData {
-                    content: trimmed_content.clone(),
+                    content: content.clone(),
                 };
-                save_scraped_data_as_json(&scraped_data, "output.json").expect("Failed to save data as JSON");
+                save_scraped_data_as_json(&scraped_data, "output.json")
+                    .expect("Failed to save data as JSON");
 
-                println!("{}", element.inner_html().trim());
                 println!("{}", content);
                 println!("{{\"{}\"}}", content);
                 println!("{}", content);

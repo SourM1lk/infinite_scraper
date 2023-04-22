@@ -1,6 +1,6 @@
-use scraper::{Html, Selector};
 use cssparser::ParserInput;
 use itertools::Itertools;
+use scraper::{Html, Selector};
 
 pub struct SelectorExtractor;
 
