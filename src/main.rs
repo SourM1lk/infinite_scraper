@@ -15,16 +15,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = ScraperConfig::from_options(options.clone())?;
 
     if options.crawl {
-        let crawler = Crawler::new(config.clone());
-        crawler.run().await?;
+        let mut crawler = Crawler::new(config.clone());
+        let selectors: Vec<String> = options.scrape_selectors
+            .as_ref()
+            .map(|s| s.split(',').map(|part| part.trim().to_owned()).collect())
+            .unwrap_or_else(Vec::new);
+        crawler.run(&selectors).await?;
     }
 
-    if options.scrape {
-        let scraper = Scraper::new(config.clone());
-        scraper.run().await?;
-    }
-
-    if options.selectors {
+    if options.list_selectors {
         let url = &config.base_url;
         println!("Fetching page: {}", url);
         let response = reqwest::get(url).await?;
@@ -39,9 +38,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    if !options.css_selectors.is_empty() {
+    if options.scrape_selectors.as_ref().map_or(false, |s| !s.is_empty()) {
         let scraper = Scraper::new(config);
-        let selectors: Vec<String> = options.css_selectors.split(',').map(|s| s.trim().to_owned()).collect();
+        let selectors: Vec<String> = options.scrape_selectors
+            .as_ref()
+            .map(|s| s.split(',').map(|part| part.trim().to_owned()).collect())
+            .unwrap_or_else(Vec::new);
         println!("Scraping data using provided CSS selectors...");
         scraper.scrape_data(&selectors).await?;
     }

@@ -18,12 +18,12 @@ pub struct CliOptions {
     #[structopt(long = "scrape")]
     pub scrape: bool,
 
-    #[structopt(long = "selectors")]
-    pub selectors: bool,
+    #[structopt(long = "list_selectors")]
+    pub list_selectors: bool,
 
-    #[structopt(long = "css_selectors", default_value = "")]
-    pub css_selectors: String,
-
+    #[structopt(long, help = "CSS selectors to use for scraping data, separated by commas")]
+    pub scrape_selectors: Option<String>,
+   
     #[structopt(long)]
     pub include_duplicates: bool,
 }

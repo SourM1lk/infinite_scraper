@@ -1,5 +1,26 @@
 use crate::config::ScraperConfig;
 use scraper::{Html, Selector};
+use serde::{Serialize, Deserialize};
+use serde_json;
+use std::fs::{OpenOptions};
+use std::io::prelude::*;
+use std::fs::File;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ScrapedData {
+    content: String,
+}
+
+pub fn save_scraped_data_as_json(data: &ScrapedData, file_name: &str) -> std::io::Result<()> {
+    let json_data = serde_json::to_string(&data).unwrap();
+    let mut file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .create(true)
+        .open(file_name)?;
+    writeln!(file, "{}", json_data)?;
+    Ok(())
+}
 
 pub struct Scraper {
     config: ScraperConfig,
@@ -14,9 +35,6 @@ impl Scraper {
         let url = format!("{}{}", self.config.base_url, self.config.start_path);
         let response = reqwest::get(&url).await?;
         let html = Html::parse_document(&response.text().await?);
-
-        // Scrape the data you want from the `html` variable.
-        // For example, extract specific information using scraper::Selector.
 
         println!("Scraped data from: {}", url);
 
@@ -42,7 +60,17 @@ impl Scraper {
 
             println!("\nScraping data for selector: {}", selector);
             for element in parsed_html.select(&scraper_selector) {
-                println!("{}", element.inner_html());
+                let content = element.text().collect::<Vec<_>>().join(" ");
+                let trimmed_content = content.trim().to_string();
+                let scraped_data = ScrapedData {
+                    content: trimmed_content.clone(),
+                };
+                save_scraped_data_as_json(&scraped_data, "output.json").expect("Failed to save data as JSON");
+
+                println!("{}", element.inner_html().trim());
+                println!("{}", content);
+                println!("{{\"{}\"}}", content);
+                println!("{}", content);
             }
         }
 
