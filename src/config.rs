@@ -1,56 +1,80 @@
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug, Clone)]
-#[structopt(name = "Web Scraper", about = "A Rust-based web scraper and crawler.")]
+#[structopt(
+    name = "Mellen Collie and the Infinite Scraper",
+    about = "A Rust-based web scraper and crawler. Name idea by: Hoax",
+    author = "SourMilk"
+)]
 pub struct CliOptions {
     #[structopt(
         long = "base_url",
         short = "u",
-        help = "Base URL to start scraping or crawling from"
+        help = "Base URL to start scraping or crawling from. (e.g., 'https://example.com')"
     )]
     pub base_url: String,
 
-    #[structopt(long = "start_path", short = "s", default_value = "/")]
+    #[structopt(
+        long = "start_path",
+        short = "s",
+        default_value = "/",
+        help = "Starting path for the scraper or crawler. Defaults to '/'."
+    )]
     pub start_path: String,
 
-    #[structopt(long = "crawl", help = "Crawl the site")]
+    #[structopt(
+        long = "crawl",
+        help = "Enable crawling mode, following links within the website."
+    )]
     pub crawl: bool,
 
     #[structopt(
         long = "scrape",
-        help = "Scrape data from the page using CSS selectors or regex"
+        help = "Enable scraping mode, extracting data from the page using CSS selectors or regex."
     )]
     pub scrape: bool,
 
-    #[structopt(long = "list_selectors", help = "List CSS selectors for the page")]
+    #[structopt(
+        long = "list_selectors",
+        help = "List all unique CSS selectors found on the page."
+    )]
     pub list_selectors: bool,
 
     #[structopt(
         long,
-        help = "CSS selectors to use for scraping data, separated by commas"
+        help = "Provide a list of CSS selectors to use for scraping data, separated by commas (e.g., '.title, .price')."
     )]
     pub use_selectors: Option<String>,
 
-    #[structopt(long, help = "Include duplicate CSS selectors in the list")]
+    #[structopt(
+        long,
+        help = "Include duplicate CSS selectors in the list of selectors found on the page."
+    )]
     pub include_duplicates: bool,
 
-    #[structopt(long = "full-download", help = "Download the page and all its assets")]
+    #[structopt(
+        long = "full-download",
+        help = "Download the entire page, including all assets such as images and stylesheets."
+    )]
     pub full_download: bool,
 
     #[structopt(
         long = "download-folder",
         parse(try_from_str),
-        help = "Folder all downloaded pages will be saved to"
+        help = "Specify the folder where all downloaded pages and assets will be saved."
     )]
     pub output_folder: Option<String>,
 
-    #[structopt(long = "use-regex", help = "Use regex to extract data")]
+    #[structopt(
+        long = "use-regex",
+        help = "Provide a regex pattern to extract data from the page."
+    )]
     pub use_regex: Option<String>,
 
     #[structopt(
         long = "interval",
         short = "i",
-        help = "Repeat command after every interval in HH:MM:SS format"
+        help = "Repeat the scraper or crawler command after every specified interval in HH:MM:SS format (e.g., '01:30:00' for 1 hour 30 minutes)."
     )]
     pub interval: Option<String>,
 
@@ -58,9 +82,16 @@ pub struct CliOptions {
         long = "max-connections",
         short = "C",
         default_value = "10",
-        help = "Maximum number of concurrent connections"
+        help = "Set the maximum number of concurrent connections for the scraper or crawler."
     )]
     pub max_connections: usize,
+
+    #[structopt(
+        long = "proxies",
+        short = "p",
+        help = "Use random proxies listed in the 'proxies.txt' file for each connection."
+    )]
+    pub use_proxies: bool,
 }
 
 #[derive(Clone)]

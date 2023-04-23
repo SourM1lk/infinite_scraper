@@ -1,31 +1,48 @@
-use crate::config::ScraperConfig;
-use crate::find::Scraper;
 use chrono::prelude::*;
+use rand::prelude::*;
 use reqwest::Url;
 use scraper::{Html, Selector};
-use std::collections::HashSet;
-use std::fs;
-use std::fs::File;
-use std::fs::OpenOptions;
-use std::io::prelude::*;
-use std::path::Path;
-use std::sync::Arc;
+use std::{
+    collections::HashSet,
+    fs::{self, File, OpenOptions},
+    io::prelude::*,
+    path::Path,
+    sync::Arc,
+};
 use tokio::sync::Semaphore;
+
+use crate::{config::ScraperConfig, find::Scraper};
 
 pub struct Crawler {
     pub config: super::config::ScraperConfig,
     pub scraper: Scraper,
     visited_urls: HashSet<String>,
     max_connections: Arc<Semaphore>,
+    proxies: Option<Vec<String>>,
 }
 
 impl Crawler {
-    pub fn new(config: ScraperConfig, max_connections: usize) -> Self {
+    pub fn new(config: ScraperConfig, max_connections: usize, use_proxies: bool) -> Self {
+        let proxies = if use_proxies {
+            match std::fs::read_to_string("proxies.txt") {
+                Ok(content) => {
+                    let proxies: Vec<String> = content.lines().map(|s| s.to_string()).collect();
+                    Some(proxies)
+                }
+                Err(e) => {
+                    eprintln!("Error reading proxies.txt: {}", e);
+                    None
+                }
+            }
+        } else {
+            None
+        };
         Crawler {
             config: config.clone(),
             scraper: Scraper::new(config),
             visited_urls: HashSet::new(),
             max_connections: Arc::new(Semaphore::new(max_connections)),
+            proxies,
         }
     }
 
@@ -40,8 +57,7 @@ impl Crawler {
                 let _permit = self.max_connections.acquire().await;
 
                 println!("Visiting: {}", url);
-                let response = reqwest::get(&url).await?;
-                let html = response.text().await?;
+                let html = self.send_request(&url).await?;
                 let links = self.extract_links(&html);
 
                 if self.config.full_download {
@@ -157,5 +173,20 @@ impl Crawler {
         }
 
         Ok(())
+    }
+
+    async fn send_request(&self, url: &str) -> Result<String, Box<dyn std::error::Error>> {
+        let client = if let Some(ref proxies) = self.proxies {
+            let proxy_url = proxies.as_slice().choose(&mut rand::thread_rng()).unwrap();
+            let proxy = reqwest::Proxy::all(proxy_url)?;
+            println!("Using proxy: {}", proxy_url);
+            reqwest::Client::builder().proxy(proxy).build()?
+        } else {
+            reqwest::Client::new()
+        };
+
+        let response = client.get(url).send().await?;
+        let html = response.text().await?;
+        Ok(html)
     }
 }
