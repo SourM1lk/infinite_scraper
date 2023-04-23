@@ -1,6 +1,10 @@
+use chrono::prelude::*;
 use cssparser::ParserInput;
 use itertools::Itertools;
 use scraper::{Html, Selector};
+use std::fs;
+use std::fs::OpenOptions;
+use std::io::prelude::*;
 
 pub struct SelectorExtractor;
 
@@ -36,6 +40,34 @@ impl SelectorExtractor {
         } else {
             selectors.into_iter().unique().collect()
         };
+        println!("Selectors extracted: {}", selectors.len());
+        self.save_selectors_to_file(&selectors).unwrap();
+
         selectors
+    }
+
+    pub fn save_selectors_to_file(&self, selectors: &[String]) -> std::io::Result<()> {
+        // Create the "Results" directory if it doesn't exist
+        fs::create_dir_all("Results")?;
+
+        // Get the current timestamp and format it
+        let timestamp = Local::now().format("%Y%m%d%H%M%S");
+
+        // Create the file path with the timestamp and the folder
+        let file_path = format!("Results/{}_selectors.txt", timestamp);
+
+        // Open the file with the new file path
+        let mut file = OpenOptions::new()
+            .write(true)
+            .append(true)
+            .create(true)
+            .open(file_path)?;
+
+        // Write selector results to the file
+        for selector in selectors {
+            writeln!(file, "{}", selector)?;
+        }
+
+        Ok(())
     }
 }

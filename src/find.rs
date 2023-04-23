@@ -1,13 +1,12 @@
 use crate::config::ScraperConfig;
+use chrono::prelude::*;
 use regex::Regex;
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
 use serde_json;
+use std::fs;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
-use std::fs;
-use chrono::prelude::*;
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ScrapedData {
@@ -16,7 +15,7 @@ pub struct ScrapedData {
 
 pub fn save_scraped_data_as_json(data: &ScrapedData, file_name: &str) -> std::io::Result<()> {
     let json_data = serde_json::to_string(&data).unwrap();
-    
+
     // Create the "Results" directory if it doesn't exist
     fs::create_dir_all("Results")?;
 
@@ -37,7 +36,6 @@ pub fn save_scraped_data_as_json(data: &ScrapedData, file_name: &str) -> std::io
     Ok(())
 }
 
-
 pub struct Scraper {
     config: ScraperConfig,
 }
@@ -46,7 +44,10 @@ impl Scraper {
     pub fn new(config: ScraperConfig) -> Self {
         Scraper { config }
     }
-    pub async fn scrape_data(&self, selectors: &[String],) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn scrape_data(
+        &self,
+        selectors: &[String],
+    ) -> Result<(), Box<dyn std::error::Error>> {
         if self.config.use_regex {
             println!("Scraping data with regex patterns.");
             self.scrape_data_with_regex(selectors).await?;
@@ -87,7 +88,10 @@ impl Scraper {
         Ok(())
     }
 
-    pub async fn scrape_data_with_regex(&self, patterns: &[String],) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn scrape_data_with_regex(
+        &self,
+        patterns: &[String],
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let url = &self.config.base_url;
         let response = reqwest::get(url).await?;
         println!("Page fetched successfully.");

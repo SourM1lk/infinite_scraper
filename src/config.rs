@@ -1,12 +1,13 @@
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug, Clone)]
-#[structopt(
-    name = "Web Scraper",
-    about = "A Rust-based web scraper and crawler."
-)]
+#[structopt(name = "Web Scraper", about = "A Rust-based web scraper and crawler.")]
 pub struct CliOptions {
-    #[structopt(long = "base_url", short = "u", help = "Base URL to start scraping or crawling from")]
+    #[structopt(
+        long = "base_url",
+        short = "u",
+        help = "Base URL to start scraping or crawling from"
+    )]
     pub base_url: String,
 
     #[structopt(long = "start_path", short = "s", default_value = "/")]
@@ -15,13 +16,19 @@ pub struct CliOptions {
     #[structopt(long = "crawl", help = "Crawl the site")]
     pub crawl: bool,
 
-    #[structopt(long = "scrape", help = "Scrape data from the page using CSS selectors or regex")]
+    #[structopt(
+        long = "scrape",
+        help = "Scrape data from the page using CSS selectors or regex"
+    )]
     pub scrape: bool,
 
     #[structopt(long = "list_selectors", help = "List CSS selectors for the page")]
     pub list_selectors: bool,
 
-    #[structopt(long, help = "CSS selectors to use for scraping data, separated by commas")]
+    #[structopt(
+        long,
+        help = "CSS selectors to use for scraping data, separated by commas"
+    )]
     pub use_selectors: Option<String>,
 
     #[structopt(long, help = "Include duplicate CSS selectors in the list")]
@@ -30,14 +37,30 @@ pub struct CliOptions {
     #[structopt(long = "full-download", help = "Download the page and all its assets")]
     pub full_download: bool,
 
-    #[structopt(long = "download-folder", parse(try_from_str), help = "Folder all downloaded pages will be saved to")]
+    #[structopt(
+        long = "download-folder",
+        parse(try_from_str),
+        help = "Folder all downloaded pages will be saved to"
+    )]
     pub output_folder: Option<String>,
 
     #[structopt(long = "use-regex", help = "Use regex to extract data")]
     pub use_regex: Option<String>,
 
-    #[structopt(long = "interval", short = "i", help = "Repeat command after every interval in HH:MM:SS format")]
+    #[structopt(
+        long = "interval",
+        short = "i",
+        help = "Repeat command after every interval in HH:MM:SS format"
+    )]
     pub interval: Option<String>,
+
+    #[structopt(
+        long = "max-connections",
+        short = "C",
+        default_value = "10",
+        help = "Maximum number of concurrent connections"
+    )]
+    pub max_connections: usize,
 }
 
 #[derive(Clone)]
@@ -47,6 +70,7 @@ pub struct ScraperConfig {
     pub full_download: bool,
     pub download_folder: String,
     pub use_regex: bool,
+    pub max_connections: usize,
 }
 
 impl ScraperConfig {
@@ -54,6 +78,7 @@ impl ScraperConfig {
         Ok(ScraperConfig {
             base_url: options.base_url,
             start_path: options.start_path,
+            max_connections: options.max_connections,
             full_download: options.full_download,
             download_folder: options
                 .output_folder

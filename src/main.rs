@@ -7,8 +7,8 @@ use config::{CliOptions, ScraperConfig};
 use crawler::Crawler;
 use find::Scraper;
 use selector::SelectorExtractor;
-use structopt::StructOpt;
 use std::time::Duration;
+use structopt::StructOpt;
 use tokio::time::sleep;
 
 #[tokio::main]
@@ -18,9 +18,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a ScraperConfig from CLI options
     let config = ScraperConfig::from_options(options.clone())?;
 
-    async fn run_scraper(options: &CliOptions, config: &ScraperConfig) -> Result<(), Box<dyn std::error::Error>> {
+    async fn run_scraper(
+        options: &CliOptions,
+        config: &ScraperConfig,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         if options.crawl {
-            let mut crawler = Crawler::new(config.clone());
+            let mut crawler = Crawler::new(config.clone(), config.max_connections);
             if options.use_regex.is_some() {
                 let selectors: Vec<String> = options
                     .use_regex
@@ -46,7 +49,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let html = response.text().await?;
             println!("Extracting CSS Selectors from the page...");
             let selector_extractor = SelectorExtractor::new();
-            let selectors = selector_extractor.extract_css_selectors(&html, options.include_duplicates);
+            let selectors =
+                selector_extractor.extract_css_selectors(&html, options.include_duplicates);
             println!("CSS Selectors found in the page:");
             for selector in selectors {
                 println!("{}", selector);
@@ -98,7 +102,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 eprintln!("Error during scraper run: {}", e);
             }
 
-            println!("Waiting for {} seconds before running scraper again...", interval_duration.as_secs());
+            println!(
+                "Waiting for {} seconds before running scraper again...",
+                interval_duration.as_secs()
+            );
             sleep(interval_duration).await;
         }
     } else {
@@ -107,4 +114,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-
