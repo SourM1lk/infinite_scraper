@@ -84,6 +84,12 @@ $ ./target/debug/infinite_scraper --base_url https://example.com --list_selector
 # Scrape data using regex patterns
 $ ./target/debug/infinite_scraper --base_url https://example.com --scrape --use-regex "Title: (.*?)\\n"
 
+# Crawl the site and scrape data using CSS selectors
+$ ./target/debug/your_binary_name --base_url https://example.com --crawl --scrape --use_selectors ".title, .description"
+
+# Crawl the site and scrape data using regex patterns
+$ ./target/debug/your_binary_name --base_url https://example.com --crawl --scrape --use-regex "(?i)<h1.*?>(.*?)</h1>|<p.*?>(.*?)</p>"
+
 # Run the scraper every 1 hour, 30 minutes, and 0 seconds
 $ ./target/debug/infinite_scraper --base_url https://example.com --scrape --use_selectors ".title, .description" --interval 01:30:00
 
