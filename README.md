@@ -66,3 +66,30 @@ OPTIONS:
     -S, --use_selectors <use-selectors>        Provide a list of CSS selectors to use for scraping data, separated by
                                                commas (e.g., '.title, .price').
 ```
+
+## Examples
+```
+# Crawl the site
+$ ./target/debug/infinite_scraper --base_url https://example.com --crawl
+
+# Scrape data using CSS selectors
+$ ./target/debug/infinite_scraper --base_url https://example.com --scrape --use_selectors ".title, .description"
+
+# List CSS selectors for the page
+$ ./target/debug/infinite_scraper --base_url https://example.com --list_selectors
+
+# Include duplicate CSS selectors in the list
+$ ./target/debug/infinite_scraper --base_url https://example.com --list_selectors --include_duplicates
+
+# Scrape data using regex patterns
+$ ./target/debug/infinite_scraper --base_url https://example.com --scrape --use-regex "Title: (.*?)\\n"
+
+# Run the scraper every 1 hour, 30 minutes, and 0 seconds
+$ ./target/debug/infinite_scraper --base_url https://example.com --scrape --use_selectors ".title, .description" --interval 01:30:00
+
+# Crawl using proxies
+$ ./target/debug/infinite_scraper --base_url https://example.com --crawl --proxies
+
+# Limit the maximum number of concurrent connections to 5
+$ ./target/debug/your_binary_name --base_url https://example.com --crawl --max-connections 5
+```
