@@ -24,7 +24,7 @@ Ensure you have the following installed on your system:
 
 1. Clone the repository:
 ```
-https://github.com/SourM1lk/web_scraper.git
+https://github.com/SourM1lk/infinite_scraper.git
 ```
 2. Change to the project directory:
 ```
