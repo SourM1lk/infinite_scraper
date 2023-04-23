@@ -28,7 +28,7 @@ https://github.com/SourM1lk/infinite_scraper.git
 ```
 2. Change to the project directory:
 ```
- cd web-scraper
+ cd infinite_scraper
 ```
 
 3. Build the project:
