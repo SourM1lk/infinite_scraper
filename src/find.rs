@@ -5,6 +5,9 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
+use std::fs;
+use chrono::prelude::*;
+
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ScrapedData {
@@ -13,14 +16,27 @@ pub struct ScrapedData {
 
 pub fn save_scraped_data_as_json(data: &ScrapedData, file_name: &str) -> std::io::Result<()> {
     let json_data = serde_json::to_string(&data).unwrap();
+    
+    // Create the "Results" directory if it doesn't exist
+    fs::create_dir_all("Results")?;
+
+    // Get the current timestamp and format it
+    let timestamp = Local::now().format("%Y%m%d%H%M%S");
+
+    // Create the file path with the timestamp and the folder
+    let file_path = format!("Results/{}_{}", timestamp, file_name);
+
+    // Open the file with the new file path
     let mut file = OpenOptions::new()
         .write(true)
         .append(true)
         .create(true)
-        .open(file_name)?;
+        .open(file_path)?;
+
     writeln!(file, "{}", json_data)?;
     Ok(())
 }
+
 
 pub struct Scraper {
     config: ScraperConfig,
@@ -71,10 +87,7 @@ impl Scraper {
         Ok(())
     }
 
-    pub async fn scrape_data_with_regex(
-        &self,
-        patterns: &[String],
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn scrape_data_with_regex(&self, patterns: &[String],) -> Result<(), Box<dyn std::error::Error>> {
         let url = &self.config.base_url;
         let response = reqwest::get(url).await?;
         println!("Page fetched successfully.");

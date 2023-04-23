@@ -93,7 +93,7 @@ impl Crawler {
 
     fn save_html(&self, url: &str, html: &str) -> std::io::Result<()> {
         // Create the downloads folder if it doesn't exist
-        let folder_path = Path::new(&self.config.output_folder);
+        let folder_path = Path::new(&self.config.download_folder);
         if !folder_path.exists() {
             fs::create_dir_all(folder_path)?;
         }
@@ -108,7 +108,7 @@ impl Crawler {
         // Change the format of the file name to include the folder and file extension
         let file_name = format!(
             "{}/{}_{}.{}",
-            self.config.output_folder,
+            self.config.download_folder,
             url.replace(":", "_").replace("/", "_"),
             "file",
             file_extension

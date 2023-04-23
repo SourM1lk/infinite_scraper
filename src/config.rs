@@ -24,17 +24,20 @@ pub struct CliOptions {
     #[structopt(long, help = "CSS selectors to use for scraping data, separated by commas")]
     pub use_selectors: Option<String>,
 
-    #[structopt(long)]
+    #[structopt(long, help = "Include duplicate CSS selectors in the list")]
     pub include_duplicates: bool,
 
     #[structopt(long = "full-download", help = "Download the page and all its assets")]
     pub full_download: bool,
 
-    #[structopt(long = "output-folder", parse(try_from_str))]
+    #[structopt(long = "download-folder", parse(try_from_str), help = "Folder all downloaded pages will be saved to")]
     pub output_folder: Option<String>,
 
     #[structopt(long = "use-regex", help = "Use regex to extract data")]
     pub use_regex: Option<String>,
+
+    #[structopt(long = "interval", short = "i", help = "Repeat command after every interval in HH:MM:SS format")]
+    pub interval: Option<String>,
 }
 
 #[derive(Clone)]
@@ -42,7 +45,7 @@ pub struct ScraperConfig {
     pub base_url: String,
     pub start_path: String,
     pub full_download: bool,
-    pub output_folder: String,
+    pub download_folder: String,
     pub use_regex: bool,
 }
 
@@ -52,7 +55,7 @@ impl ScraperConfig {
             base_url: options.base_url,
             start_path: options.start_path,
             full_download: options.full_download,
-            output_folder: options
+            download_folder: options
                 .output_folder
                 .clone()
                 .unwrap_or_else(|| "downloads".to_string()),
