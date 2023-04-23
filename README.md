@@ -41,29 +41,28 @@ You should now have a compiled binary in the `target/debug` directory. You can u
 ## Command-Line Options
 ```
 USAGE:
-    web_scraper [FLAGS] [OPTIONS] --base_url <base-url>
+    infinite_scraper [FLAGS] [OPTIONS] --base_url <base-url>
 
 FLAGS:
         --crawl                 Enable crawling mode, following links within the website.
-        --full-download         Download the entire page, including all assets such as images and stylesheets.
+    -F, --full-download         Download the entire page, including all assets such as images and stylesheets.
     -h, --help                  Prints help information
-        --include-duplicates    Include duplicate CSS selectors in the list of selectors found on the page.
-        --list_selectors        List all unique CSS selectors found on the page.
+    -D, --include_duplicates    Include duplicate CSS selectors in the list of selectors found on the page.
+    -L, --list_selectors        List all unique CSS selectors found on the page.
         --scrape                Enable scraping mode, extracting data from the page using CSS selectors or regex.
-    -p, --proxies               Use random proxies listed in the 'proxies.txt' file for each connection.
+    -P, --proxies               Use random proxies listed in the 'proxies.txt' file for each connection.
     -V, --version               Prints version information
 
 OPTIONS:
     -u, --base_url <base-url>                  Base URL to start scraping or crawling from. (e.g.,
                                                'https://example.com')
-    -i, --interval <interval>                  Repeat the scraper or crawler command after every specified interval in
+    -I, --interval <interval>                  Repeat the scraper or crawler command after every specified interval in
                                                HH:MM:SS format (e.g., '01:30:00' for 1 hour 30 minutes).
     -C, --max-connections <max-connections>    Set the maximum number of concurrent connections for the scraper or
                                                crawler. [default: 10]
         --download-folder <output-folder>      Specify the folder where all downloaded pages and assets will be saved.
     -s, --start_path <start-path>              Starting path for the scraper or crawler. Defaults to '/'. [default: /]
-        --use-regex <use-regex>                Provide a regex pattern to extract data from the page.
-        --use-selectors <use-selectors>        Provide a list of CSS selectors to use for scraping data, separated by
+    -R, --use-regex <use-regex>                Provide a regex pattern to extract data from the page.
+    -S, --use_selectors <use-selectors>        Provide a list of CSS selectors to use for scraping data, separated by
                                                commas (e.g., '.title, .price').
-
 ```

@@ -36,24 +36,28 @@ pub struct CliOptions {
 
     #[structopt(
         long = "list_selectors",
+        short = "L",
         help = "List all unique CSS selectors found on the page."
     )]
     pub list_selectors: bool,
 
     #[structopt(
-        long,
+        long = "use_selectors",
+        short = "S",
         help = "Provide a list of CSS selectors to use for scraping data, separated by commas (e.g., '.title, .price')."
     )]
     pub use_selectors: Option<String>,
 
     #[structopt(
-        long,
+        long = "include_duplicates",
+        short = "D",
         help = "Include duplicate CSS selectors in the list of selectors found on the page."
     )]
     pub include_duplicates: bool,
 
     #[structopt(
         long = "full-download",
+        short = "F",
         help = "Download the entire page, including all assets such as images and stylesheets."
     )]
     pub full_download: bool,
@@ -67,13 +71,14 @@ pub struct CliOptions {
 
     #[structopt(
         long = "use-regex",
+        short = "R",
         help = "Provide a regex pattern to extract data from the page."
     )]
     pub use_regex: Option<String>,
 
     #[structopt(
         long = "interval",
-        short = "i",
+        short = "I",
         help = "Repeat the scraper or crawler command after every specified interval in HH:MM:SS format (e.g., '01:30:00' for 1 hour 30 minutes)."
     )]
     pub interval: Option<String>,
@@ -88,7 +93,7 @@ pub struct CliOptions {
 
     #[structopt(
         long = "proxies",
-        short = "p",
+        short = "P",
         help = "Use random proxies listed in the 'proxies.txt' file for each connection."
     )]
     pub use_proxies: bool,
